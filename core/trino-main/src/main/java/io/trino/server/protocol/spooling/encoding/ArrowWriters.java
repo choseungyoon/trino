@@ -179,8 +179,9 @@ public final class ArrowWriters
         if (type instanceof IntervalYearMonthType) {
             return new ArrowType.Interval(IntervalUnit.YEAR_MONTH);
         }
-        if (type instanceof IntervalDayTimeType intervalType && intervalType.getFractionalPrecision() <= IntervalDayTimeType.MAX_SHORT_FRACTIONAL_PRECISION) {
-            return new ArrowType.Duration(TimeUnit.MICROSECOND);
+        if (type instanceof IntervalDayTimeType) {
+            // Trino 483 stores day-time intervals as milliseconds
+            return new ArrowType.Duration(TimeUnit.MILLISECOND);
         }
         throw new TrinoException(NOT_SUPPORTED, format("Type %s is not supported by the arrow spooling encoding, use json encoding instead", type));
     }
