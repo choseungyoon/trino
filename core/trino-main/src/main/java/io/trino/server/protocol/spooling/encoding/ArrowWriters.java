@@ -44,7 +44,7 @@ import org.apache.arrow.vector.FixedSizeBinaryVector;
 import org.apache.arrow.vector.Float4Vector;
 import org.apache.arrow.vector.Float8Vector;
 import org.apache.arrow.vector.IntVector;
-import org.apache.arrow.vector.IntervalYearVector;
+import org.apache.arrow.vector.IntervalMonthDayNanoVector;
 import org.apache.arrow.vector.NullVector;
 import org.apache.arrow.vector.SmallIntVector;
 import org.apache.arrow.vector.TimeMicroVector;
@@ -177,7 +177,8 @@ public final class ArrowWriters
             return new ArrowType.Timestamp(timeUnit(timestampType.getPrecision()), "UTC");
         }
         if (type instanceof IntervalYearMonthType) {
-            return new ArrowType.Interval(IntervalUnit.YEAR_MONTH);
+            // MONTH_DAY_NANO is the most widely supported Arrow interval, for example pyarrow cannot read YEAR_MONTH values
+            return new ArrowType.Interval(IntervalUnit.MONTH_DAY_NANO);
         }
         if (type instanceof IntervalDayTimeType) {
             // Trino 483 stores day-time intervals as milliseconds
@@ -207,7 +208,7 @@ public final class ArrowWriters
             case Float4Vector v -> (block, position) -> v.setSafe(position, REAL.getFloat(block, position));
             case Float8Vector v -> (block, position) -> v.setSafe(position, DOUBLE.getDouble(block, position));
             case DateDayVector v -> (block, position) -> v.setSafe(position, DATE.getInt(block, position));
-            case IntervalYearVector v -> (block, position) -> v.setSafe(position, ((IntervalYearMonthType) type).getInt(block, position));
+            case IntervalMonthDayNanoVector v -> (block, position) -> v.setSafe(position, ((IntervalYearMonthType) type).getInt(block, position), 0, 0);
             case DurationVector v -> (block, position) -> v.setSafe(position, type.getLong(block, position));
             // Trino stores UUIDs in RFC 4122 byte order
             case FixedSizeBinaryVector v -> (block, position) -> v.setSafe(position, UUID.getSlice(block, position).getBytes());

@@ -65,6 +65,7 @@ import static io.trino.spi.type.TimestampWithTimeZoneType.TIMESTAMP_TZ_MILLIS;
 import static io.trino.spi.type.UuidType.javaUuidToTrinoUuid;
 import static io.trino.spi.type.VarbinaryType.VARBINARY;
 import static io.trino.spi.type.VarcharType.VARCHAR;
+import static io.trino.type.IntervalYearMonthType.INTERVAL_YEAR_MONTH;
 import static io.trino.util.StructuralTestUtil.arrayBlockOf;
 import static io.trino.util.StructuralTestUtil.mapType;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,6 +102,7 @@ final class TestArrowQueryDataEncoder
         assertRawLongs(TIMESTAMP_NANOS, values(new LongTimestamp(1, 500_000)), 1_500);
         assertRawLongs(TIMESTAMP_TZ_MILLIS, values(packDateTimeWithZone(1_234, UTC_KEY)), 1_234);
         assertRoundTrip(TIME_MICROS, values(3_000_000L), values(3L)); // picos -> micros
+        assertThat(encodeAndRead(INTERVAL_YEAR_MONTH, values(14L)).getFirst().toString()).isEqualTo("P14M PT0S");
     }
 
     @Test
