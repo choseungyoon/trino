@@ -87,7 +87,8 @@ final class TestArrowQueryDataEncoder
         assertRoundTrip(createDecimalType(10, 2), values(12345L, null), values(new BigDecimal("123.45"), null));
         assertRoundTrip(createDecimalType(30, 2), values(Int128.valueOf(-12345)), values(new BigDecimal("-123.45")));
 
-        assertThat(encodeAndRead(VARBINARY, values(new byte[] {1, 2}))).containsExactly(new byte[] {1, 2});
+        byte[] binary = (byte[]) encodeAndRead(VARBINARY, values((Object) new byte[] {1, 2})).getFirst();
+        assertThat(binary).containsExactly(1, 2);
 
         UUID uuid = UUID.fromString("12151fd2-7586-11e9-8f9e-2a86e4085a59");
         byte[] actual = (byte[]) encodeAndRead(UuidType.UUID, values(javaUuidToTrinoUuid(uuid))).getFirst();
